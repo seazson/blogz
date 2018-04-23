@@ -1,0 +1,15 @@
+{% extends 'base_post.html' %}
+{% import "_macros.html" as macros %}
+
+{% block title %}BlogZ - Post{% endblock %}
+
+{% block post_content %}
+{% include '_posts.html' %}
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.blog') }}
+</div>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2" sidebar>
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="#"> 专题 <span class="sr-only">(current)</span></a></li>
+            <div class="panel-group">
+            {% for dir_dict in dirs_list %}
+                <div class="panel panel-primary leftMenu">
+                    <div class="panel-heading" data-toggle="collapse" data-target="#accordion-element-{{ dir_dict['name'] }}">
+                        <h4 class="panel-title">
+                        {{ dir_dict['name'] }}
+                        <span class="glyphicon glyphicon-chevron-down right"></span>
+                        </h4>
+                    </div>
+                    <div id="accordion-element-{{ dir_dict['name'] }}" class="panel-collapse collapse">
+                        <ul class="list-group">
+                            <li class="menu-item-left1"><a href="{{ url_for('.dir', dirpath=dir_dict['name']) }}">ALL</a></li>
+                        {% for dirlevel,dir1,dir2,dir3 in dir_dict['list'] %}
+                            {% if dirlevel == 2 %}
+                                <li class="menu-item-left2"><a href="{{ url_for('.dir', dirpath=dir1 + '/'+dir2) }}">{{ dir2 }}</a></li>
+                            {% elif dirlevel == 3 %}
+                                <li class="menu-item-left3"><a href="{{ url_for('.dir', dirpath=dir1+'/'+dir2+'/'+dir3) }}">{{ dir3 }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+          </ul>
+
+          <div class="nav nav-sidebar" id="contents">
+            <div id="box">
+              <div id="float" class="div1"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-9 col-md-10 main">
+            <div class="entry">
+            {% block post_content %}
+            {% endblock %}
+            </div>
+        </div>
+      </div>
+
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}?=9"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='highlight/styles/agate.css') }}">
+<script src="{{ url_for('static', filename='highlight/highlight.pack.js') }}"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script type="text/javascript">
+{% if showpost == 1 %}
+$(document).ready(function() {
+    'use strict';
+    var oDiv = document.getElementById("float");
+    if (oDiv === null) return false;
+    var H = 0,
+        iE6;
+    var Y = oDiv;
+    if ($(window).width() <= 650) {
+        return;
+    }
+    while (Y) {
+        H += Y.offsetTop;
+        Y = Y.offsetParent;
+    }
+    iE6 = window.ActiveXObject && !window.XMLHttpRequest;
+    if (!iE6) {
+        window.onscroll = function() {
+            var s = document.body.scrollTop || document.documentElement.scrollTop;
+            if (s > H) {
+                oDiv.className = "div1 div2";
+                if (iE6) {
+                    oDiv.style.top = (s - H) + "px";
+                }
+            } else {
+                oDiv.className = "div1";
+            }
+        };
+    }
+
+    function articleIndex() {
+        var $article = $('.entry');
+        var $header = $article.find('h2, h3');
+        var _html = '<h2>目录</h2><div class="panel panel-default widget-outline"><div class="panel-body"><ul id="articleIndex"></ul></div></div>';
+        $('#float').append(_html);
+        $('.widget-outline').css({
+            'width': $('#float').width() + 0,
+            //'left': $('.side').offset().left + 15,
+        });
+        var count = 1;
+        var _tagLevel = 1;
+        var _$wrap = $('#articleIndex');
+        $header.each(function(index) {
+            if ($(this).text().trim() === '') {
+                return;
+            }
+            // $(this).attr('id', 'articleHeader' + index);
+            var hid = $(this).attr('id');
+            if (!hid) {
+                hid = 'toc-id-' + count;
+                $(this).attr('id', hid);
+            }
+            var _tl = parseInt($(this)[0].tagName.slice(1));
+            var _$li = null;
+            if (index === 0 || _tl === _tagLevel) {
+                _$li = $('<li><a href="#' + hid + '">' + $(this).text() + '</a></li>');
+                _$wrap.append(_$li);
+            } else if (_tl > _tagLevel) {
+                _$li = $('<ul><li><a href="#' + hid + '">' + $(this).text() + '</a></li></ul>');
+                _$wrap.append(_$li);
+                _$wrap = _$li;
+            } else if (_tl < _tagLevel) {
+                _$li = $('<li><a href="#' + hid + '">' + $(this).text() + '</a></li>');
+                if (_tl === 1) {
+                    $('#articleIndex').append(_$li);
+                    _$wrap = $('#articleIndex');
+                } else {
+                    _$wrap.parent('ul').append(_$li);
+                    _$wrap = _$wrap.parent('ul');
+                }
+            }
+            _tagLevel = _tl;
+            count++;
+        });
+        $('#articleIndex ul').css({
+            'margin-left': 15
+        });
+    }
+    articleIndex();
+});
+{% endif %}
+$(function(){
+	$(".panel-heading").click(function(e){
+		/*切换折叠指示图标*/
+		$(this).find("span").toggleClass("glyphicon-chevron-down");
+		$(this).find("span").toggleClass("glyphicon-chevron-up");
+	});
+});
+</script>
+{% endblock %}
