@@ -59,3 +59,6 @@ class PostForm(FlaskForm):
 #    body = PageDownField("内容", validators=[DataRequired()]) 用于markdown组件
     body = TextAreaField("富文本", validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+class SearchForm(FlaskForm):
+    search = StringField('search', validators=[DataRequired()])

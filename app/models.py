@@ -9,6 +9,8 @@ from flask_login import UserMixin, AnonymousUserMixin, current_user
 from . import db, login_manager
 import json, os
 import time
+import flask_whooshalchemyplus
+from jieba.analyse.analyzer import ChineseAnalyzer
 
 class Permission:
     FOLLOW = 1
@@ -322,6 +324,9 @@ def load_user(user_id):
 
 class Post(db.Model):
     __tablename__ = 'posts'
+    __searchable__ = ['body','name']
+    __analyzer__ = ChineseAnalyzer()
+
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
     body_html = db.Column(db.Text)
@@ -337,6 +342,9 @@ class Post(db.Model):
     def __init__(self, **kwargs):
         super(Post, self).__init__(**kwargs)
 
+    def __repr__(self):
+        return '<Post {}>'.format(self.body)
+    
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
         allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
@@ -379,3 +387,4 @@ class Post(db.Model):
             rec_json.update_by_url(post)
         
 db.event.listen(Post.body, 'set', Post.on_changed_body) #在数据库写body字段时触发
+

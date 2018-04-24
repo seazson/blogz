@@ -1,13 +1,19 @@
 from flask import render_template, redirect, url_for, abort, flash, request,\
-    current_app, make_response
+    current_app, make_response, g
 from flask_login import login_required, current_user
 from . import main
-from .forms import EditProfileForm, EditProfileAdminForm, PostForm
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm, SearchForm
 from .. import db
 from ..models import Permission, Role, User, Post, Record_json
 from ..decorators import admin_required
 from datetime import datetime
 import os,random
+from flask_whooshalchemyplus import index_all
+
+@main.before_request
+def before_request():
+  g.user = current_user
+  g.search_form = SearchForm()
 
 @main.route('/', methods=['GET', 'POST'])#路由
 def index():#视图函数
@@ -215,3 +221,22 @@ def ckupload():
     response = make_response(res)
     response.headers["Content-Type"] = "text/html"
     return response
+
+@main.route('/search', methods=['GET', 'POST'])
+def search():
+    index_all(current_app) #建立查找索引
+    if not g.search_form.validate_on_submit():
+        return redirect(url_for('.blog'))
+    return redirect(url_for('.search_results', query = g.search_form.search.data))
+
+    
+@main.route('/search_results/<query>')
+def search_results(query):
+    rec_json = Record_json()
+    rec_json.get_dirs()
+    page = request.args.get('page', 1, type=int)
+    pagination = Post.query.whoosh_search(query, 50).order_by(Post.timestamp.desc()).paginate(
+        page, per_page=current_app.config['BLOGZ_POSTS_PER_PAGE'],
+        error_out=False)
+    posts = pagination.items
+    return render_template('search_results.html', query = query, posts=posts, pagination=pagination, dir='.blog',dirs_list=rec_json.dirs_list)

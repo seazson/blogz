@@ -15,7 +15,9 @@ class Config:
     BLOGZ_ADMIN = os.environ.get('BLOGZ_ADMIN','admin@blogz.com')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     BLOGZ_POSTS_PER_PAGE = 20
-
+    WHOOSH_BASE = os.path.join(basedir, 'search')
+    #WHOOSH_DISABLED = True 使能这个就不能进行搜索了
+    
     @staticmethod
     def init_app(app):
         pass

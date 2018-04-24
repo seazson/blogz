@@ -9,7 +9,7 @@ blogZ
     
     安装依赖包
     pip install -r requirements.txt（不好使）
-    pip install flask_migrate flask_bootstrap flask_mail flask_moment flask_wtf flask_script flask_login flask_pagedown bleach markdown
+    pip install flask_migrate flask_bootstrap flask_mail flask_moment flask_wtf flask_script flask_login flask_pagedown bleach markdown Flask-WhooshAlchemyplus jieba
 
     如果要发送邮件的话需要设置环境变量
     export MAIL_USERNAME xx@xx.com
