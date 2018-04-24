@@ -103,7 +103,12 @@ def edit(id):
     if form.validate_on_submit():
         urlold = post.url
         post.name = form.name.data
-        post.dir = form.dir1.data + '/' + form.dir2.data + '/' + form.dir3.data
+        post.dir = form.dir1.data
+        if form.dir2.data != '':
+            post.dir +=  '/' + form.dir2.data
+        if form.dir3.data != '':
+            post.dir +=  '/' + form.dir3.data
+        print(post.dir)
         post.tag = form.tag.data
         post.url = 'doc/'+ post.dir + '/' + post.name + '.html'
         post.hide = 1
@@ -124,7 +129,7 @@ def edit(id):
         if urlold != post.url:
             print('dir change')
             if urlold and os.path.exists(urlold):
-                os.remove(urlold) #fixed 平台相关
+                os.remove(urlold) #python已经能够自动识别windows和linux路径
         return redirect(url_for('.post', id=post.id))
     #如果之前创建过则加载已有信息
     if id:
