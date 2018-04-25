@@ -6,7 +6,7 @@
 {{ super() }}
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}?=65">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}?=67">
 {% endblock %}
 
 {% block navbar %}
@@ -44,9 +44,9 @@
                 <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
                 {% endif %}
             </ul>
-			<form class="navbar-form navbar-right">
-                <input type="text" class="form-control" placeholder="Search...">
-            </form>
+            {% if g.search_form %}
+            <form class="navbar-form navbar-right" style="display: inline;" action="{{url_for('main.search')}}" method="post" name="search">{{g.search_form.hidden_tag()}}{{g.search_form.search(size=20,class='form-control')}}</form>
+            {% endif %}
         </div>
     </div>
 </div>

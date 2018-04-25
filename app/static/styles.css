@@ -237,24 +237,4 @@ div.flask-pagedown-preview h3 {
 }
 
 /*编辑栏*/
-.control-label-title{
-    font-size: 18px;
-    line-height: 30px;
-    color: #9966FF;
-}
-.submit-article-title {
-    width: 500px;
-    height:30px;
-    font-size: 18px;
-    line-height: 30px;
-}
 
-.submit-article-tag {
-    width: 450px;
-    height:20px;
-}
-
-.submit-article-dir {
-    width: 150px;
-    height:20px;
-}
