@@ -4,7 +4,9 @@
 {% block title %}BlogZ - blogs{% endblock %}
 
 {% block post_content %}
-<a href="{{ url_for('main.edit',id=0) }}" class="btn btn-primary">写文章</a>
+<div align="center">
+    <a href="{{ url_for('main.edit',id=0) }}" class="btn btn-primary">写文章</a>
+</div>
 {% include '_posts.html' %}
 
 {% if pagination %}

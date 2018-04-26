@@ -115,6 +115,13 @@ class Record_json():
         self.recs.append(rec);
         self.save()
 
+    def delete(self, post):
+        self.load()
+        for rec_dict in self.recs:
+            if rec_dict['id'] == post.id:
+                self.recs.remove(rec_dict);
+        self.save()
+
     def update_by_url(self, post):#用于从数据库中导出到json文件中
         self.load()
         rec = {}
@@ -173,14 +180,12 @@ class Record_json():
                     print('_' + dir_split[1])
                     tdir2 = dir_split[1]
                     dir_dict['list'].append([2,tdir1,dir_split[1],''])
-                    #self.dirs_list.append([2,tdir1,dir_split[1],''])
 
             if slen > 2:
                 if tdir3 != dir_split[2]:
                     print('__' + dir_split[2])
                     tdir3 = dir_split[2]
-                    dir_dict['list'].append([3,tdir1,tdir2,dir_split[1]])
-                    #self.dirs_list.append([3,tdir1,tdir2,dir_split[2]])
+                    dir_dict['list'].append([3,tdir1,tdir2,dir_split[2]])
         self.dirs_list.append(dir_dict.copy())
         print(self.dirs_list)#建立起要创建的dir顺序和层级
 

@@ -4,6 +4,7 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-sm-3 col-md-2" sidebar>
+          {% if not showpost %}
           <ul class="nav nav-sidebar">
             <li class="active"><a href="#"> 专题 <span class="sr-only">(current)</span></a></li>
             <div class="panel-group">
@@ -31,6 +32,7 @@
             {% endfor %}
             </div>
           </ul>
+          {% endif %}
 
           <div class="nav nav-sidebar" id="contents">
             <div id="box">
@@ -45,7 +47,7 @@
             </div>
         </div>
       </div>
-
+    </div>
 {% endblock %}
 {% block scripts %}
 {{ super() }}

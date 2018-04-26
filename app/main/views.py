@@ -101,7 +101,8 @@ def edit(id):
     if current_user != post.author and \
             not current_user.can(Permission.ADMIN):
         abort(403)
-    id=post.id
+    if post.id:
+        id=post.id
     form = PostForm()
     rec_json = Record_json()
     rec_json.get_dirs()
@@ -136,9 +137,12 @@ def edit(id):
             print('dir change')
             if urlold and os.path.exists(urlold):
                 os.remove(urlold) #python已经能够自动识别windows和linux路径
+                work_path = os.path.dirname(urlold)#如果文件夹为空，删除文件夹
+                if not os.listdir(work_path):
+                     os.rmdir(work_path)
         return redirect(url_for('.post', id=post.id))
     #如果之前创建过则加载已有信息
-    if id:
+    if post.id:
         form.name.data = post.name
         form.tag.data = post.tag
         form.body.data = post.body
@@ -150,7 +154,29 @@ def edit(id):
             form.dir2.data = dirsplit[1]
         if slen > 2:
             form.dir3.data = dirsplit[2]
-    return render_template('edit_post.html', form=form, dirs=sorted(rec_json.dirs),dirs_list=rec_json.dirs_list)
+    return render_template('edit_post.html', id=id,form=form, dirs=sorted(rec_json.dirs),dirs_list=rec_json.dirs_list)
+
+#删除文章
+@main.route('/delete_post/<int:id>', methods=['GET', 'POST'])
+@login_required
+def delete_post(id):
+    rec_json = Record_json()
+    rec_json.get_dirs()
+    post = Post.query.get_or_404(id)#从数据库中查找一个存在的post
+    if current_user != post.author and \
+        not current_user.can(Permission.ADMIN):
+        abort(403)
+    urlold = post.url
+    db.session.delete(post)
+    db.session.commit()
+    rec_json.delete(post)
+    if urlold and os.path.exists(urlold):
+        os.remove(urlold)
+        work_path = os.path.dirname(urlold)
+        if not os.listdir(work_path):
+             os.rmdir(work_path)
+    return render_template('delete_post.html', post=post, dirs=sorted(rec_json.dirs),dirs_list=rec_json.dirs_list)
+
 
 #显示单个文章
 @main.route('/post/<int:id>')
@@ -200,7 +226,7 @@ def ckupload():
         fileobj = request.files['upload']
         fname, fext = os.path.splitext(fileobj.filename)
         rnd_name = '%s%s' % (gen_rnd_filename(), fext)
-        filepath = os.path.join('upload', rnd_name)
+        filepath = os.path.join(current_app.static_folder,'upload', rnd_name)
         # 检查路径是否存在，不存在则创建
         dirname = os.path.dirname(filepath)
         if not os.path.exists(dirname):
@@ -212,12 +238,16 @@ def ckupload():
             error = 'ERROR_DIR_NOT_WRITEABLE'
         if not error:
             fileobj.save(filepath)
-            url = url_for('', filename='%s/%s' % ('upload', rnd_name))
+            url = url_for('static', filename='%s/%s' % ('upload', rnd_name))
     else:
         error = 'post error'
-    res = """<script type="text/javascript">
+    res = """
+
+<script type="text/javascript">
   window.parent.CKEDITOR.tools.callFunction(%s, '%s', '%s');
-</script>""" % (callback, url, error)
+</script>
+
+""" % (callback, url, error)
     response = make_response(res)
     response.headers["Content-Type"] = "text/html"
     return response
