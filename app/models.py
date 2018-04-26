@@ -78,7 +78,7 @@ class Record_json():
     dirs_list = []  #每个元素都是一个字典，包含了主级目录及下面的目录列表信息，例如
                     #[{'name': 'linux', 'list': [[2, 'linux', '内存管理', '']]}, 
                     #{'name': 'x86', 'list': [[2, 'x86', '1', ''], [3, 'x86', '1', '1'], [2, 'x86', '2', '']]}]
-    jsonfile = os.path.join('doc', 'data.json')
+    jsonfile = os.path.join('app', 'static', 'doc', 'data.json')
 
     def __init__(self, **kwargs):
         if not os.path.exists(os.path.dirname(self.jsonfile)):
@@ -107,8 +107,8 @@ class Record_json():
         rec['url'] = post.url
         rec['auth'] = post.author_id
         rec['hide'] = post.hide
-        rec['createtime'] = post.timestamp.strftime("%Y-%m-%d %X")
-        rec['updatetime'] = time.strftime("%Y-%m-%d %X", time.localtime())
+        rec['createtime'] = post.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        rec['updatetime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         for rec_dict in self.recs:
             if rec_dict['id'] == rec['id']:
                 self.recs.remove(rec_dict);
@@ -132,8 +132,8 @@ class Record_json():
         rec['url'] = post.url
         rec['auth'] = post.author_id
         rec['hide'] = post.hide
-        rec['createtime'] = post.timestamp.strftime("%Y-%m-%d-%H")
-        rec['updatetime'] = time.strftime("%Y-%m-%d %X", time.localtime())
+        rec['createtime'] = post.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        rec['updatetime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         for rec_dict in self.recs:
             if rec_dict['url'] == rec['url']:
                 self.recs.remove(rec_dict);
@@ -390,6 +390,11 @@ class Post(db.Model):
         posts = Post.query.order_by(Post.id).all()
         for post in posts:
             rec_json.update_by_url(post)
+            if not os.path.exists(os.path.dirname(post.url)) :
+                os.makedirs(os.path.dirname(post.url))
+            fh = open(post.url, 'w')
+            fh.write(post.body)
+            fh.close()
         
 db.event.listen(Post.body, 'set', Post.on_changed_body) #在数据库写body字段时触发
 

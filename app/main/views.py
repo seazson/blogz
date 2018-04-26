@@ -117,7 +117,7 @@ def edit(id):
             post.dir +=  '/' + form.dir3.data
         print(post.dir)
         post.tag = form.tag.data
-        post.url = 'doc/'+ post.dir + '/' + post.name + '.html'
+        post.url = current_app.config['DOC_DIR'] +'/'+ post.dir + '/' + post.name + '.html'
         post.hide = 1
         post.body = form.body.data
         db.session.add(post)
@@ -126,7 +126,8 @@ def edit(id):
         #更新json文件
         rec_json.update(post)
         #创建文件
-        dirname = os.path.join('doc', form.dir1.data, form.dir2.data, form.dir3.data)
+        dirname = os.path.join(current_app.config['DOC_DIR'], form.dir1.data,\
+                               form.dir2.data, form.dir3.data)
         if not os.path.exists(dirname) :
             os.makedirs(dirname)
         fh = open(post.url, 'w')
@@ -226,7 +227,7 @@ def ckupload():
         fileobj = request.files['upload']
         fname, fext = os.path.splitext(fileobj.filename)
         rnd_name = '%s%s' % (gen_rnd_filename(), fext)
-        filepath = os.path.join(current_app.static_folder,'upload', rnd_name)
+        filepath = os.path.join(current_app.config['DOC_DIR'],'upload', rnd_name)
         # 检查路径是否存在，不存在则创建
         dirname = os.path.dirname(filepath)
         if not os.path.exists(dirname):
@@ -238,7 +239,7 @@ def ckupload():
             error = 'ERROR_DIR_NOT_WRITEABLE'
         if not error:
             fileobj.save(filepath)
-            url = url_for('static', filename='%s/%s' % ('upload', rnd_name))
+            url = url_for('static', filename='%s/%s' % ('doc/upload', rnd_name))
     else:
         error = 'post error'
     res = """

@@ -18,6 +18,7 @@ class Config:
     WHOOSH_BASE = os.path.join(basedir, 'search')
     #WHOOSH_DISABLED = True 使能这个就不能进行搜索了
     
+    DOC_DIR = os.path.join(basedir, 'app', 'static', 'doc')
     @staticmethod
     def init_app(app):
         pass
