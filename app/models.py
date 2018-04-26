@@ -84,16 +84,16 @@ class Record_json():
         if not os.path.exists(os.path.dirname(self.jsonfile)):
             os.makedirs(os.path.dirname(self.jsonfile))
         if not os.path.exists(self.jsonfile):
-            fd = open(self.jsonfile, 'w')
+            fd = open(self.jsonfile, 'w', encoding='utf-8')
             fd.write('[]')
             fd.close()
             
     def save(self):
-        with open(self.jsonfile, 'w') as f:
+        with open(self.jsonfile, 'w', encoding='utf-8') as f:
             json.dump(self.recs, f)
 
     def load(self):
-        with open(self.jsonfile, 'r') as f:
+        with open(self.jsonfile, 'r', encoding='utf-8') as f:
             self.recs = json.load(f)
         #print(self.recs)
 
@@ -379,7 +379,7 @@ class Post(db.Model):
             post.timestamp = datetime.strptime(rec_dict['createtime'], '%Y-%m-%d %H:%M:%S')
             post.timestamp = datetime.strptime(rec_dict['updatetime'], '%Y-%m-%d %H:%M:%S')
             if post.url and os.path.exists(post.url):
-                fd = open(post.url)
+                fd = open(post.url, 'r', encoding='utf-8')
                 post.body = fd.read()
             db.session.add(post)
             db.session.commit()
@@ -392,7 +392,7 @@ class Post(db.Model):
             rec_json.update_by_url(post)
             if not os.path.exists(os.path.dirname(post.url)) :
                 os.makedirs(os.path.dirname(post.url))
-            fh = open(post.url, 'w')
+            fh = open(post.url, 'w', encoding='utf-8')
             fh.write(post.body)
             fh.close()
         
