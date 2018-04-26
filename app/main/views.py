@@ -130,7 +130,7 @@ def edit(id):
                                form.dir2.data, form.dir3.data)
         if not os.path.exists(dirname) :
             os.makedirs(dirname)
-        fh = open(post.url, 'w')
+        fh = open(post.url, 'w', encoding='utf-8')
         fh.write(post.body_html)
         fh.close()
         #更改了目录或者文件名
@@ -185,7 +185,7 @@ def post(id):
     rec_json = Record_json()
     rec_json.get_dirs()
     post = Post.query.get_or_404(id)
-    return render_template('post.html', posts=[post], showpost=1,dir='post',dirs_list=rec_json.dirs_list)
+    return render_template('post.html', posts=[post], showpost=1,dir='.dir/' + post.dir,dirs_list=rec_json.dirs_list)
 
 #显示分类文章
 @main.route('/dir/<path:dirpath>', methods=['GET', 'POST'])

@@ -45,7 +45,7 @@
                 {% endif %}
             </ul>
             {% if g.search_form %}
-            <form class="navbar-form navbar-right" style="display: inline;" action="{{url_for('main.search')}}" method="post" name="search">{{g.search_form.hidden_tag()}}{{g.search_form.search(size=20,class='form-control')}}</form>
+            <form class="navbar-form navbar-right" style="display: inline;" action="{{url_for('main.search')}}" method="post" name="search">{{g.search_form.hidden_tag()}}{{g.search_form.search(size=20,class='form-control',placeholder="Search")}}</form>
             {% endif %}
         </div>
     </div>
