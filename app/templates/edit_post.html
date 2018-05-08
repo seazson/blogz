@@ -47,14 +47,21 @@
             </div>
         </div>
         <div class="form-group">
-            {{ form.body(class="ckeditor") }}
+            {{ form.body(class="ckeditor", id="editor1") }}
         </div>
-        <div class="submit-article-button" align="center">
-            <button type="submit" class="btn btn-success right">提交</button>
+        <div class="row">
+            <div class="submit-article-button col-sm-6" align="center">
+                <button type="submit" class="btn btn-success">提交</button>
+            </div>
+            <div class="form-group col-sm-2" align="right">
+                <label id="tosave" class="btn btn-success">暂存</label>
+            </div>
+            <div class="form-group col-sm-4" align="center">
+                <p id="footer"></p>
+            </div>
         </div>
     </form>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
@@ -65,6 +72,25 @@
             $("#del").click(function(){
             return confirm("是否确认删除");
         });
+    });
+
+    function autosave(){
+        $.post("/edit/autosave",
+            {
+                data : CKEDITOR.instances.editor1.getData(),  //获取当前编辑的html格式数据
+                id  : {{ id }},
+            },
+            function(data,status){
+                if(status == "success")
+                    document.getElementById("footer").innerHTML='update:' + new Date().toLocaleString();
+                else
+                    document.getElementById("footer").innerHTML='更新失败';
+        });
+    }
+    var myVar=setInterval(autosave,60000); 
+            
+    $("#tosave").click(function(){
+        autosave();
     });
 </script>
 {% endblock %}

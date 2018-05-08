@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for, abort, flash, request,\
-    current_app, make_response, g
+    current_app, make_response, g, jsonify
 from flask_login import login_required, current_user
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm, SearchForm
@@ -156,6 +156,22 @@ def edit(id):
         if slen > 2:
             form.dir3.data = dirsplit[2]
     return render_template('edit_post.html', id=id,form=form, dirs=sorted(rec_json.dirs),dirs_list=rec_json.dirs_list)
+
+#定时保存
+@main.route('/edit/autosave', methods=['GET', 'POST'])
+@login_required
+def editsave():
+    data=request.form.get('data')
+    id=request.form.get('id')
+    if id != 0:
+        post = Post.query.get_or_404(id)#从数据库中查找一个存在的post
+        if current_user != post.author and \
+                not current_user.can(Permission.ADMIN):
+            abort(403)
+        post.body = data
+        db.session.add(post)
+        db.session.commit()
+    return jsonify({'result':'ok'})
 
 #删除文章
 @main.route('/delete_post/<int:id>', methods=['GET', 'POST'])
